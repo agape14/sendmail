@@ -1,0 +1,62 @@
+📅 CONFIGURACIÓN CRON JOB PARA HOSTINGER cPANEL
+
+═══════════════════════════════════════════════════════════
+
+🎯 OBJETIVO: Enviar 15 consultas en 3 días:
+   • Sábado 21 Sept: 5 consultas
+   • Domingo 22 Sept: 5 consultas
+   • Lunes 23 Sept: 5 consultas
+
+📋 COMANDOS PARA cPANEL (Agregar estos 3 cron jobs):
+
+# Sábado 21: 5 consultas (9 AM, 11 AM, 1 PM, 3 PM, 5 PM)
+0 9,11,13,15,17 21 09 6 /usr/local/bin/php /home/TU-USUARIO/public_html/sendmail/artisan mype:send-consulta --force
+
+# Domingo 22: 5 consultas (10 AM, 12 PM, 2 PM, 4 PM, 6 PM)
+0 10,12,14,16,18 22 09 0 /usr/local/bin/php /home/TU-USUARIO/public_html/sendmail/artisan mype:send-consulta --force
+
+# Lunes 23: 5 consultas (9 AM, 11 AM, 1 PM, 3 PM, 5 PM)
+0 9,11,13,15,17 23 09 1 /usr/local/bin/php /home/TU-USUARIO/public_html/sendmail/artisan mype:send-consulta --force
+
+⚠️  IMPORTANTE: Cambiar "TU-USUARIO" por tu username real de Hostinger
+
+═══════════════════════════════════════════════════════════
+
+📝 PASOS EN cPANEL:
+
+1. Login a tu cuenta Hostinger
+2. Ir a cPanel
+3. Buscar "Cron Jobs"
+4. "Add New Cron Job"
+5. Pegar el comando de arriba
+6. Cambiar "TU-USUARIO" por tu usuario real
+7. Guardar
+
+═══════════════════════════════════════════════════════════
+
+⏰ HORARIOS DE ENVÍO:
+   • Viernes 20/09/2025 a las 10:00 AM (Lima)
+   • Sábado 21/09/2025 a las 10:00 AM (Lima)
+   • Domingo 22/09/2025 a las 10:00 AM (Lima)
+
+📧 RESULTADO:
+   • FROM: Nombre Sender - Organización <consultas@sendmail.delacruzdev.tech>
+   • Reply-to: email.natural.sender@dominio.com
+   • Contenido: Variaciones naturales para cada envío
+   • Destinatario: Eleccionescomprasamyperu@produce.gob.pe
+
+═══════════════════════════════════════════════════════════
+
+🔧 COMANDOS ÚTILES EN SERVIDOR:
+
+# Ver estadísticas
+php artisan mype:stats
+
+# Envío manual
+php artisan mype:send-consulta --force
+
+# Resetear preguntas (nuevo ciclo)
+php artisan mype:reset-questions --force
+
+# Ver logs
+tail -f storage/logs/laravel.log
