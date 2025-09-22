@@ -17,7 +17,7 @@ class MyPeController
             $totalQuestions = Question::count();
             $sentQuestions = Question::where('is_sent', true)->count();
             $pendingQuestions = $totalQuestions - $sentQuestions;
-            $lastSent = Question::where('is_sent', true)->orderBy('sent_at', 'desc')->first();
+            $lastSent = Question::where('is_sent', true)->orderBy('last_sent_at', 'desc')->first();
             
             // Obtener configuración con valores por defecto
             $config = [
