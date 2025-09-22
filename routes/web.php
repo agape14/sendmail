@@ -30,7 +30,7 @@ Route::get('/test-routes', function () {
     ], 200, [], JSON_UNESCAPED_UNICODE);
 })->name('test.routes');
 
-// Endpoint de respaldo para configuración (sin middleware)
+// Endpoints directos sin middleware para evitar problemas de servidor
 Route::get('/api/config', function () {
     try {
         $config = [
@@ -66,3 +66,77 @@ Route::get('/api/config', function () {
         ], 200, [], JSON_UNESCAPED_UNICODE);
     }
 })->name('api.config');
+
+// Endpoint directo para estadísticas
+Route::get('/api/stats', function () {
+    try {
+        $totalQuestions = \App\Models\Question::count();
+        $sentQuestions = \App\Models\Question::where('is_sent', true)->count();
+        $pendingQuestions = $totalQuestions - $sentQuestions;
+        $lastSent = \App\Models\Question::where('is_sent', true)->orderBy('last_sent_at', 'desc')->first();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Estadísticas obtenidas exitosamente',
+            'data' => [
+                'totalQuestions' => $totalQuestions,
+                'sentQuestions' => $sentQuestions,
+                'pendingQuestions' => $pendingQuestions,
+                'lastSent' => $lastSent ? $lastSent->last_sent_at : null
+            ]
+        ], 200, [], JSON_UNESCAPED_UNICODE);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al obtener estadísticas: ' . $e->getMessage(),
+            'data' => [
+                'totalQuestions' => 0,
+                'sentQuestions' => 0,
+                'pendingQuestions' => 0,
+                'lastSent' => null
+            ]
+        ], 200, [], JSON_UNESCAPED_UNICODE);
+    }
+})->name('api.stats');
+
+// Endpoint directo para enviar consulta
+Route::post('/api/send-consulta', function () {
+    try {
+        $exitCode = \Illuminate\Support\Facades\Artisan::call('mype:send-consulta', ['--force' => true]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        
+        return response()->json([
+            'success' => $exitCode === 0,
+            'message' => $exitCode === 0 ? 'Consulta enviada exitosamente' : 'Error al enviar consulta',
+            'output' => $output,
+            'exit_code' => $exitCode
+        ], 200, [], JSON_UNESCAPED_UNICODE);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al enviar consulta: ' . $e->getMessage(),
+            'output' => $e->getMessage()
+        ], 200, [], JSON_UNESCAPED_UNICODE);
+    }
+})->name('api.send-consulta');
+
+// Endpoint directo para resetear preguntas
+Route::post('/api/reset-questions', function () {
+    try {
+        $exitCode = \Illuminate\Support\Facades\Artisan::call('mype:reset-questions');
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        
+        return response()->json([
+            'success' => $exitCode === 0,
+            'message' => $exitCode === 0 ? 'Preguntas reseteadas exitosamente' : 'Error al resetear preguntas',
+            'output' => $output,
+            'exit_code' => $exitCode
+        ], 200, [], JSON_UNESCAPED_UNICODE);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al resetear preguntas: ' . $e->getMessage(),
+            'output' => $e->getMessage()
+        ], 200, [], JSON_UNESCAPED_UNICODE);
+    }
+})->name('api.reset-questions');

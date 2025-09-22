@@ -440,7 +440,7 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos
                 
-                fetch('/mype/send-consulta', {
+                fetch('/api/send-consulta', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -499,7 +499,7 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos
                 
-                fetch('/mype/reset-questions', {
+                fetch('/api/reset-questions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -533,26 +533,53 @@
             });
         });
 
-        // Actualizar estadísticas
+        // Actualizar estadísticas usando endpoint directo
         document.getElementById('refreshStatsBtn').addEventListener('click', function() {
             // Cambiar el texto del botón para mostrar que está actualizando
             const originalText = this.innerHTML;
             this.disabled = true;
             this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Actualizando...';
             
-            updateStats();
-            
-            // Rehabilitar botón después de 2 segundos
-            setTimeout(() => {
+            fetch('/api/stats')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Actualizar las estadísticas en la interfaz
+                    document.getElementById('totalQuestions').textContent = data.data.totalQuestions;
+                    document.getElementById('sentQuestions').textContent = data.data.sentQuestions;
+                    document.getElementById('pendingQuestions').textContent = data.data.pendingQuestions;
+                    
+                    if (data.data.lastSent) {
+                        const lastSentDate = new Date(data.data.lastSent);
+                        document.getElementById('lastSent').textContent = lastSentDate.toLocaleString('es-ES');
+                    } else {
+                        document.getElementById('lastSent').textContent = 'Nunca';
+                    }
+                    
+                    showAlert('✅ Estadísticas actualizadas correctamente', 'success');
+                } else {
+                    throw new Error(data.message || 'Error en la respuesta');
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener estadísticas:', error);
+                showAlert('❌ Error al obtener estadísticas: ' + error.message, 'danger');
+            })
+            .finally(() => {
+                // Rehabilitar botón
                 this.disabled = false;
                 this.innerHTML = originalText;
-            }, 2000);
+            });
         });
 
-        // Ver configuración con fallback
+        // Ver configuración usando endpoint directo
         document.getElementById('viewConfigBtn').addEventListener('click', function() {
-            // Intentar primero el endpoint principal
-            fetch('/mype/config')
+            fetch('/api/config')
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -567,26 +594,8 @@
                 }
             })
             .catch(error => {
-                console.log('Endpoint principal falló, intentando endpoint de respaldo...', error);
-                // Intentar endpoint de respaldo
-                return fetch('/api/config')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        showConfigModal(data.config);
-                    } else {
-                        throw new Error(data.message || 'Error en la respuesta de respaldo');
-                    }
-                });
-            })
-            .catch(error => {
-                console.error('Ambos endpoints fallaron:', error);
-                showAlert('❌ Error al obtener configuración: ' + error.message + '. Verifica que el servidor esté funcionando correctamente.', 'danger');
+                console.error('Error al obtener configuración:', error);
+                showAlert('❌ Error al obtener configuración: ' + error.message, 'danger');
             });
         });
 
