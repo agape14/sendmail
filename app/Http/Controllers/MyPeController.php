@@ -35,22 +35,75 @@ class MyPeController
                 'detailed_logging' => config('mype.detailed_logging', true),
             ];
             
-            return view('mype.dashboard', compact('totalQuestions', 'sentQuestions', 'pendingQuestions', 'lastSent', 'config'));
+            // Intentar cargar la vista con fallback
+            if (view()->exists('mype.dashboard')) {
+                return view('mype.dashboard', compact('totalQuestions', 'sentQuestions', 'pendingQuestions', 'lastSent', 'config'));
+            } elseif (view()->exists('mype.dashboard-fallback')) {
+                return view('mype.dashboard-fallback', compact('totalQuestions', 'sentQuestions', 'pendingQuestions', 'lastSent', 'config'));
+            } else {
+                // Fallback final: retornar JSON si ninguna vista existe
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Dashboard MYPE',
+                    'data' => [
+                        'totalQuestions' => $totalQuestions,
+                        'sentQuestions' => $sentQuestions,
+                        'pendingQuestions' => $pendingQuestions,
+                        'lastSent' => $lastSent,
+                        'config' => $config
+                    ]
+                ], 200, [], JSON_UNESCAPED_UNICODE);
+            }
         } catch (\Exception $e) {
             Log::error('Error en dashboard', ['error' => $e->getMessage()]);
-            return view('mype.dashboard', [
-                'totalQuestions' => 0,
-                'sentQuestions' => 0,
-                'pendingQuestions' => 0,
-                'lastSent' => null,
-                'config' => [
-                    'target_email' => 'Eleccionescomprasamyperu@produce.gob.pe',
-                    'sender_name' => 'Consultas MYPE',
-                    'min_days' => 1,
-                    'max_days' => 3,
-                ],
-                'error' => $e->getMessage()
-            ]);
+            
+            // Fallback para errores también
+            if (view()->exists('mype.dashboard')) {
+                return view('mype.dashboard', [
+                    'totalQuestions' => 0,
+                    'sentQuestions' => 0,
+                    'pendingQuestions' => 0,
+                    'lastSent' => null,
+                    'config' => [
+                        'target_email' => 'Eleccionescomprasamyperu@produce.gob.pe',
+                        'sender_name' => 'Consultas MYPE',
+                        'min_days' => 1,
+                        'max_days' => 3,
+                    ],
+                    'error' => $e->getMessage()
+                ]);
+            } elseif (view()->exists('mype.dashboard-fallback')) {
+                return view('mype.dashboard-fallback', [
+                    'totalQuestions' => 0,
+                    'sentQuestions' => 0,
+                    'pendingQuestions' => 0,
+                    'lastSent' => null,
+                    'config' => [
+                        'target_email' => 'Eleccionescomprasamyperu@produce.gob.pe',
+                        'sender_name' => 'Consultas MYPE',
+                        'min_days' => 1,
+                        'max_days' => 3,
+                    ],
+                    'error' => $e->getMessage()
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error en dashboard: ' . $e->getMessage(),
+                    'data' => [
+                        'totalQuestions' => 0,
+                        'sentQuestions' => 0,
+                        'pendingQuestions' => 0,
+                        'lastSent' => null,
+                        'config' => [
+                            'target_email' => 'Eleccionescomprasamyperu@produce.gob.pe',
+                            'sender_name' => 'Consultas MYPE',
+                            'min_days' => 1,
+                            'max_days' => 3,
+                        ]
+                    ]
+                ], 500, [], JSON_UNESCAPED_UNICODE);
+            }
         }
     }
     public function sendConsulta()
