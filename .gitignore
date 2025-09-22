@@ -230,112 +230,87 @@ bootstrap/cache/*.php
 # Laravel Blade
 /blade/
 
-# Laravel Views
-/views/
+# Laravel Views - NO IGNORAR
+# /views/
 
-# Laravel Controllers
-/controllers/
+# Laravel Controllers - NO IGNORAR
+# /controllers/
 
-# Laravel Models
-/models/
+# Laravel Models - NO IGNORAR
+# /models/
 
-# Laravel Migrations
-/migrations/
+# Laravel Migrations - NO IGNORAR
+# /migrations/
 
-# Laravel Seeders
-/seeders/
+# Laravel Seeders - NO IGNORAR
+# /seeders/
 
-# Laravel Factories
-/factories/
+# Laravel Factories - NO IGNORAR
+# /factories/
 
-# Laravel Tests
-/tests/
+# Laravel Tests - NO IGNORAR
+# /tests/
 
-# Laravel Features
-/features/
+# Laravel Features - NO IGNORAR
+# /features/
 
-# Laravel Resources
-/resources/
+# Laravel Resources - NO IGNORAR
+# /resources/
 
-# Laravel Assets
-/assets/
+# Laravel Assets - NO IGNORAR
+# /assets/
 
-# Laravel Public
-/public/
+# Laravel Public - NO IGNORAR
+# /public/
 
-# Laravel Storage
-/storage/
-
-# Laravel Bootstrap
-/bootstrap/
-
-# Laravel Config
-/config/
-
-# Laravel Database
-/database/
-
-# Laravel Routes
-/routes/
-
-# Laravel App
-/app/
-
-# Laravel Root
-/*.php
-/*.json
-/*.lock
-/*.md
-/*.txt
-/*.yml
-/*.yaml
-/*.xml
-/*.ini
-/*.conf
-/*.cfg
-/*.log
-/*.sql
-/*.db
-/*.sqlite
-/*.sqlite3
-/*.bak
-/*.backup
-/*.tmp
-/*.temp
-/*.cache
-/*.pid
-/*.seed
-/*.pid.lock
-/*.swp
-/*.swo
-/*~
-/.DS_Store
-/.DS_Store?
-/._*
-/.Spotlight-V100
-/.Trashes
-/ehthumbs.db
-/Thumbs.db
-/.vscode/
-/.idea/
-/node_modules/
-/vendor/
-/public/hot
-/public/storage
-/storage/*.key
-/storage/app/*
-!/storage/app/.gitkeep
+# Laravel Storage - IGNORAR SOLO CACHE Y LOGS
 /storage/framework/cache/*
 !/storage/framework/cache/.gitkeep
 /storage/framework/sessions/*
 !/storage/framework/sessions/.gitkeep
-/storage/framework/testing/*
-!/storage/framework/testing/.gitkeep
 /storage/framework/views/*
 !/storage/framework/views/.gitkeep
 /storage/logs/*
 !/storage/logs/.gitkeep
-/bootstrap/cache/*
-!/bootstrap/cache/.gitkeep
+/storage/app/*
+!/storage/app/.gitkeep
+
+# Laravel Bootstrap - NO IGNORAR
+# /bootstrap/
+
+# Laravel Config - NO IGNORAR
+# /config/
+
+# Laravel Database - NO IGNORAR
+# /database/
+
+# Laravel Routes - NO IGNORAR
+# /routes/
+
+# Laravel App - NO IGNORAR
+# /app/
+
+# Archivos temporales y de sistema
+*.tmp
+*.temp
+*.cache
+*.pid
+*.seed
+*.pid.lock
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs específicos
 storage/logs/laravel.log
-/storage
