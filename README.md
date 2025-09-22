@@ -65,11 +65,23 @@ php artisan migrate --seed
 
 ## 🎯 Uso
 
-### Comandos Disponibles
+### 🌐 **Interfaz Web (Recomendado)**
+
+Accede a: `https://sendmail.delacruzdev.tech/`
+
+**Funcionalidades de la interfaz web:**
+- 📊 **Dashboard completo** con estadísticas en tiempo real
+- 🚀 **Envío manual** de consultas con un clic
+- 🔄 **Reset de preguntas** para reiniciar el bot
+- ⚙️ **Configuración** del bot
+- 📅 **Cronograma** de envíos automáticos
+- 📱 **Diseño responsive** para móviles
+
+### 💻 **Comandos de Consola**
 
 #### Enviar Consulta Manual
 ```bash
-php artisan mype:send-consulta
+php artisan mype:send-consulta --force
 ```
 Envía inmediatamente una consulta aleatoria.
 
@@ -91,15 +103,22 @@ php artisan mype:scheduled-send
 ```
 Comando interno usado por el scheduler para envíos automáticos.
 
-### Activar Bot Automático
+### ⏰ **Configuración del Cron Job en Hostinger**
 
-Para activar el envío automático, configura un cron job en tu servidor:
-
-```bash
-* * * * * cd /ruta/a/tu/proyecto && php artisan schedule:run >> /dev/null 2>&1
+**Para el Sábado 21 Septiembre:**
+```
+0 14,16,18,20,22 21 09 6 /usr/local/bin/php /home/u926438338/public_html/sendmail/artisan mype:send-consulta --force
 ```
 
-El bot verificará diariamente a las 10:00 AM si debe enviar una consulta según la programación aleatoria.
+**Para el Domingo 22 Septiembre:**
+```
+0 15,17,19,21,23 22 09 0 /usr/local/bin/php /home/u926438338/public_html/sendmail/artisan mype:send-consulta --force
+```
+
+**Para el Lunes 23 Septiembre:**
+```
+0 14,16,18,20,22 23 09 1 /usr/local/bin/php /home/u926438338/public_html/sendmail/artisan mype:send-consulta --force
+```
 
 ## 📧 Configuración de Correo
 
