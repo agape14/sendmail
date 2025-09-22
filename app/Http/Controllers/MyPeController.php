@@ -233,25 +233,42 @@ class MyPeController
     public function getConfig()
     {
         try {
+            // Configurar headers para JSON
+            header('Content-Type: application/json; charset=utf-8');
+            
             $config = [
-                'target_email' => config('mype.target_email'),
-                'sender_name' => config('mype.sender_name'),
-                'min_days' => config('mype.min_days_between_sends'),
-                'max_days' => config('mype.max_days_between_sends'),
-                'mail_mailer' => config('mail.default'),
-                'mail_from_address' => config('mail.from.address'),
-                'mail_from_name' => config('mail.from.name'),
+                'target_email' => config('mype.target_email', 'Eleccionescomprasamyperu@produce.gob.pe'),
+                'sender_name' => config('mype.sender_name', 'Consultas MYPE'),
+                'min_days' => config('mype.min_days_between_emails', 1),
+                'max_days' => config('mype.max_days_between_emails', 7),
+                'mail_mailer' => config('mail.default', 'smtp'),
+                'mail_from_address' => config('mail.from.address', 'consultas@sendmail.delacruzdev.tech'),
+                'mail_from_name' => config('mail.from.name', 'Consultas MYPE'),
+                'mail_host' => config('mail.mailers.smtp.host', 'smtp.smtp2go.com'),
+                'mail_port' => config('mail.mailers.smtp.port', 2525),
+                'send_hours_min' => config('mype.send_hours.min', 9),
+                'send_hours_max' => config('mype.send_hours.max', 17),
+                'detailed_logging' => config('mype.detailed_logging', true),
             ];
             
             return response()->json([
                 'success' => true,
+                'message' => 'Configuración obtenida exitosamente',
                 'config' => $config
             ], 200, [], JSON_UNESCAPED_UNICODE);
         } catch (\Exception $e) {
+            Log::error('Error en getConfig', ['error' => $e->getMessage()]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener configuración: ' . $e->getMessage()
-            ], 500, [], JSON_UNESCAPED_UNICODE);
+                'message' => 'Error al obtener configuración: ' . $e->getMessage(),
+                'config' => [
+                    'target_email' => 'Eleccionescomprasamyperu@produce.gob.pe',
+                    'sender_name' => 'Consultas MYPE',
+                    'min_days' => 1,
+                    'max_days' => 7,
+                ]
+            ], 200, [], JSON_UNESCAPED_UNICODE);
         }
     }
     
