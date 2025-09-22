@@ -2226,3 +2226,4 @@ Enviando correo...
 💡 Puedes enviar la siguiente consulta con: php artisan mype:send-consulta
 
 "} 
+[2025-09-22 13:41:37] local.INFO: Consulta MYPE enviada {"question_id":8,"question_number":8,"target_email":"adelacruzcarlos@gmail.com","sent_at":"2025-09-22 13:41:37"} 

@@ -161,7 +161,7 @@
                 <div class="row mb-5">
                     <div class="col-md-3">
                         <div class="stat-card text-center">
-                            <div class="stat-number">{{ $totalQuestions }}</div>
+                            <div class="stat-number" id="totalQuestions">{{ $totalQuestions }}</div>
                             <div class="stat-label">
                                 <i class="fas fa-question-circle me-2"></i>
                                 Total Preguntas
@@ -170,7 +170,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card text-center">
-                            <div class="stat-number text-success">{{ $sentQuestions }}</div>
+                            <div class="stat-number text-success" id="sentQuestions">{{ $sentQuestions }}</div>
                             <div class="stat-label">
                                 <i class="fas fa-check-circle me-2"></i>
                                 Enviadas
@@ -179,7 +179,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card text-center">
-                            <div class="stat-number text-warning">{{ $pendingQuestions }}</div>
+                            <div class="stat-number text-warning" id="pendingQuestions">{{ $pendingQuestions }}</div>
                             <div class="stat-label">
                                 <i class="fas fa-clock me-2"></i>
                                 Pendientes
@@ -188,7 +188,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card text-center">
-                            <div class="stat-number text-info">
+                            <div class="stat-number text-info" id="lastSent">
                                 @if($lastSent)
                                     {{ \Carbon\Carbon::parse($lastSent->sent_at)->format('d/m') }}
                                 @else
@@ -384,32 +384,20 @@
 
         // Función para actualizar estadísticas sin recargar página
         function updateStats() {
-            fetch('/mype/stats')
+            fetch('/api-stats.php')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Parsear las estadísticas del output
-                    const output = data.output;
+                    // Actualizar cada estadística usando los IDs
+                    document.getElementById('totalQuestions').textContent = data.data.totalQuestions;
+                    document.getElementById('sentQuestions').textContent = data.data.sentQuestions;
+                    document.getElementById('pendingQuestions').textContent = data.data.pendingQuestions;
                     
-                    const totalMatch = output.match(/Total de preguntas: (\d+)/);
-                    const sentMatch = output.match(/Preguntas enviadas: (\d+)/);
-                    const pendingMatch = output.match(/Preguntas pendientes: (\d+)/);
-                    const lastSentMatch = output.match(/Último envío: (.+)/);
-                    
-                    // Actualizar cada tarjeta de estadística
-                    const statCards = document.querySelectorAll('.stat-card');
-                    
-                    if (totalMatch && statCards[0]) {
-                        statCards[0].querySelector('.stat-number').textContent = totalMatch[1];
-                    }
-                    if (sentMatch && statCards[1]) {
-                        statCards[1].querySelector('.stat-number').textContent = sentMatch[1];
-                    }
-                    if (pendingMatch && statCards[2]) {
-                        statCards[2].querySelector('.stat-number').textContent = pendingMatch[1];
-                    }
-                    if (lastSentMatch && statCards[3]) {
-                        statCards[3].querySelector('.stat-number').textContent = lastSentMatch[1];
+                    if (data.data.lastSent) {
+                        const lastSentDate = new Date(data.data.lastSent);
+                        document.getElementById('lastSent').textContent = lastSentDate.toLocaleDateString('es-ES');
+                    } else {
+                        document.getElementById('lastSent').textContent = '--';
                     }
                 }
             })
@@ -440,7 +428,7 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos
                 
-                fetch('/api/send-consulta', {
+                fetch('/api-send-consulta.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -499,7 +487,7 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos
                 
-                fetch('/api/reset-questions', {
+                fetch('/api-reset-questions.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -540,7 +528,7 @@
             this.disabled = true;
             this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Actualizando...';
             
-            fetch('/api/stats')
+            fetch('/api-stats.php')
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -549,16 +537,16 @@
             })
             .then(data => {
                 if (data.success) {
-                    // Actualizar las estadísticas en la interfaz
+                    // Actualizar las estadísticas en la interfaz usando los IDs
                     document.getElementById('totalQuestions').textContent = data.data.totalQuestions;
                     document.getElementById('sentQuestions').textContent = data.data.sentQuestions;
                     document.getElementById('pendingQuestions').textContent = data.data.pendingQuestions;
                     
                     if (data.data.lastSent) {
                         const lastSentDate = new Date(data.data.lastSent);
-                        document.getElementById('lastSent').textContent = lastSentDate.toLocaleString('es-ES');
+                        document.getElementById('lastSent').textContent = lastSentDate.toLocaleDateString('es-ES');
                     } else {
-                        document.getElementById('lastSent').textContent = 'Nunca';
+                        document.getElementById('lastSent').textContent = '--';
                     }
                     
                     showAlert('✅ Estadísticas actualizadas correctamente', 'success');
@@ -577,9 +565,9 @@
             });
         });
 
-        // Ver configuración usando endpoint directo
+        // Ver configuración usando archivo PHP directo
         document.getElementById('viewConfigBtn').addEventListener('click', function() {
-            fetch('/api/config')
+            fetch('/api-config.php')
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
