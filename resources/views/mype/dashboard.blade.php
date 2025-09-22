@@ -549,32 +549,61 @@
             }, 2000);
         });
 
-        // Ver configuración
+        // Ver configuración con fallback
         document.getElementById('viewConfigBtn').addEventListener('click', function() {
+            // Intentar primero el endpoint principal
             fetch('/mype/config')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    let configText = '📋 Configuración del Bot:\n\n';
-                    Object.entries(data.config).forEach(([key, value]) => {
-                        configText += `${key}: ${value}\n`;
-                    });
-                    
-                    Swal.fire({
-                        title: 'Configuración del Bot',
-                        text: configText,
-                        icon: 'info',
-                        confirmButtonText: 'Entendido',
-                        confirmButtonColor: '#17a2b8'
-                    });
+                    showConfigModal(data.config);
                 } else {
-                    showAlert('❌ ' + data.message, 'danger');
+                    throw new Error(data.message || 'Error en la respuesta');
                 }
             })
             .catch(error => {
-                showAlert('❌ Error al obtener configuración: ' + error.message, 'danger');
+                console.log('Endpoint principal falló, intentando endpoint de respaldo...', error);
+                // Intentar endpoint de respaldo
+                return fetch('/api/config')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showConfigModal(data.config);
+                    } else {
+                        throw new Error(data.message || 'Error en la respuesta de respaldo');
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Ambos endpoints fallaron:', error);
+                showAlert('❌ Error al obtener configuración: ' + error.message + '. Verifica que el servidor esté funcionando correctamente.', 'danger');
             });
         });
+
+        function showConfigModal(config) {
+            let configText = '📋 Configuración del Bot:\n\n';
+            Object.entries(config).forEach(([key, value]) => {
+                configText += `${key}: ${value}\n`;
+            });
+            
+            Swal.fire({
+                title: 'Configuración del Bot',
+                text: configText,
+                icon: 'info',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#17a2b8'
+            });
+        }
     </script>
 </body>
 </html>
